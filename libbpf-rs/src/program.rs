@@ -987,6 +987,16 @@ impl<'obj> ProgramMut<'obj> {
         Ok(link)
     }
 
+    /// Attach this program to a network interface
+    #[doc(alias = "bpf_program__attach_tcx")]
+    pub fn attach_tcx(&self, ifindex: i32) -> Result<Link> {
+        let ptr = unsafe { libbpf_sys::bpf_program__attach_tcx(self.ptr.as_ptr(), ifindex, ptr::null()) };
+        let ptr = validate_bpf_ret(ptr).context("failed to attach interface")?;
+        // SAFETY: the pointer came from libbpf and has been checked for errors.
+        let link = unsafe { Link::new(ptr) };
+        Ok(link)
+    }
+
     /// Attach this program to a [perf event](https://linux.die.net/man/2/perf_event_open).
     #[doc(alias = "bpf_program__attach_perf_event")]
     pub fn attach_perf_event(&self, pfd: i32) -> Result<Link> {
